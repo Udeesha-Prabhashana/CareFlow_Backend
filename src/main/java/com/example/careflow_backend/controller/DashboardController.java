@@ -14,20 +14,20 @@ import java.security.Principal;
 public class DashboardController {
 
     //@PreAuthorize("hasAnyRole('ROLE_MANAGER','ROLE_ADMIN','ROLE_USER')")
-    @PreAuthorize("hasAuthority('SCOPE_READ')")
+//    @PreAuthorize("hasAuthority('SCOPE_READ')")
     @GetMapping("/welcome-message")
     public ResponseEntity<String> getFirstWelcomeMessage(Authentication authentication){
         return ResponseEntity.ok("Welcome to the JWT Tutorial:"+authentication.getName()+"with scope:"+authentication.getAuthorities());
     }
 
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+//    @PreAuthorize("hasRole('ROLE_MANAGER')")
 //    @PreAuthorize("hasAuthority('SCOPE_READ')")
     @GetMapping("/manager-message")
     public ResponseEntity<String> getManagerData(Principal principal){
         return ResponseEntity.ok("Manager::"+principal.getName());
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    @PreAuthorize("hasAuthority('SCOPE_WRITE')")
     @GetMapping("/admin-message")
     public ResponseEntity<String> getAdminData(Principal principal){

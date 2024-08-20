@@ -18,7 +18,7 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+//    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/add_appointment")
     public ResponseEntity<String> addAppointment(@Valid @RequestBody AppointmentDto appointmentDto) {
         try {

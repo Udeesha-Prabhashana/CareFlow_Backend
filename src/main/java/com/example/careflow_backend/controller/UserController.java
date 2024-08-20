@@ -27,7 +27,7 @@ public class UserController {
     @Autowired
     private UserService userService; // Ensure this is not static
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/Doctors")
     public ResponseEntity<List<UserDto>> getDoctors() {
         try {
