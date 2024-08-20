@@ -1,6 +1,5 @@
 package com.example.careflow_backend.controller;
 
-import com.example.careflow_backend.Entity.UserEntity;
 import com.example.careflow_backend.dto.UserDto;
 import com.example.careflow_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin("http://localhost:3000")
-public class AdminController {
+public class UserController {
 
     @Autowired
     private UserService userService; // Ensure this is not static
