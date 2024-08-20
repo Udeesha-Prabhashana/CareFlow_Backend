@@ -20,7 +20,7 @@ public class DoctorAvailabilityController {
 
     private final DoctorAvailabilityService doctorAvailabilityService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+//    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/add_doctor_availability")
     public ResponseEntity<String> addDoctorAvailability(@Valid @RequestBody DoctorAvailabilityDto doctorAvailabilityDto) {
         try {
@@ -34,7 +34,7 @@ public class DoctorAvailabilityController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+//    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/get_doctor_availability")
     public ResponseEntity<?> getDoctorAvailability(@Valid @RequestBody DoctorAvailabilityDto doctorAvailabilityDto){
         try {
