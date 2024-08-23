@@ -47,6 +47,16 @@ public class UserEntity {
     @Column(nullable = false, name = "password")
     private String password;
 
+    @Column(name = "photo_url")
+    private String photoUrl;
+
+    @Column(name = "description")
+    private String description;
+
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Specify cascade and fetch types
+    @JsonManagedReference
+    private List<DoctorAvailabilityEntity> availability;
+
     // Many-to-One relationship with RefreshTokenEntity
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference // This is the owning side of the relationship
