@@ -25,7 +25,7 @@ public class RefreshTokenEntity {
     @Column(name = "REVOKED")    //When sing-out, refresh token can not be use because Revoked is true
     private boolean revoked;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ToString.Exclude // Exclude from toString to prevent circular reference
     private UserEntity user;
