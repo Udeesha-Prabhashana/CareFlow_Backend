@@ -38,7 +38,7 @@ public class AppointmentEntity {
     private Integer slotNumber;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    private Integer status;
 
     @Column(name = "reason_for_visit")
     private String reasonForVisit;

@@ -24,7 +24,7 @@ public class JwtTokenGenerator {
 
     private final JwtEncoder jwtEncoder;
 
-    public String generateAccessToken(Authentication authentication, String email) {
+    public String generateAccessToken(Authentication authentication, Long user_id , String email) {
 
         log.info("[JwtTokenGenerator:generateAccessToken] Token Creation Started for:{}", authentication.getName());
 
@@ -39,7 +39,8 @@ public class JwtTokenGenerator {
                 .subject(authentication.getName())
                 .claim("scope", permissions)
                 .claim("roles", roles)
-                .claim("email", email)
+                .claim("user_id", user_id)
+                .claim("email", email )
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

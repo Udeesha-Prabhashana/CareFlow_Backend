@@ -76,26 +76,26 @@ public class SecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFil
                 .build();
     }
 
-//    @Order(2)
-//    @Bean
-//    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
-//        return httpSecurity
-//                .securityMatcher(new AntPathRequestMatcher("/api/**"))
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(auth -> auth
-//                        .anyRequest().authenticated())
-//                .oauth2ResourceServer(oauth2 -> oauth2
-//                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .addFilterBefore(new JwtAccessTokenFilter(rsaKeyRecord, jwtTokenUtils), UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling(ex -> {
-//                    log.error("[SecurityConfig:apiSecurityFilterChain] Exception due to :{}", ex);
-//                    ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());
-//                    ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
-//                })
-//                .httpBasic(withDefaults())
-//                .build();
-//    }
+    @Order(2)
+    @Bean
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .securityMatcher(new AntPathRequestMatcher("/api/**"))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JwtAccessTokenFilter(rsaKeyRecord, jwtTokenUtils), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> {
+                    log.error("[SecurityConfig:apiSecurityFilterChain] Exception due to :{}", ex);
+                    ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());
+                    ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
+                })
+                .httpBasic(withDefaults())
+                .build();
+    }
 
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
