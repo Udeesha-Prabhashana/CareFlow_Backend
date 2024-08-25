@@ -1,5 +1,6 @@
 package com.example.careflow_backend.Entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class DoctorAvailabilityEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     @JsonBackReference
+    @JsonIgnore
     private UserEntity doctor;
 
     @Column(name = "available_date", nullable = false)

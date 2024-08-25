@@ -7,7 +7,7 @@ public class AppointmentDto {
     private Long patientId;
     private LocalDate appointmentDate;
     private Integer slotNumber;
-    private String status;
+    private Integer status;
     private String reasonForVisit;
 
     // Default constructor
@@ -15,7 +15,7 @@ public class AppointmentDto {
     }
 
     // Parameterized constructor
-    public AppointmentDto(Long id, Long doctorId, Long patientId, LocalDate appointmentDate, Integer slotNumber, String status, String reasonForVisit) {
+    public AppointmentDto(Long id, Long doctorId, Long patientId, LocalDate appointmentDate, Integer slotNumber, Integer status, String reasonForVisit) {
         this.id = id;
         this.doctorId = doctorId;
         this.patientId = patientId;
@@ -67,11 +67,11 @@ public class AppointmentDto {
         this.slotNumber = slotNumber;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 @Table(name="Users")
 public class UserEntity {
 
@@ -55,6 +56,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Specify cascade and fetch types
     @JsonManagedReference
+    @ToString.Exclude
     private List<DoctorAvailabilityEntity> availability;
 
     // Many-to-One relationship with RefreshTokenEntity
