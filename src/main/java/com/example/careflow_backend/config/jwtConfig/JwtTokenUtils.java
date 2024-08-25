@@ -23,6 +23,10 @@ public class JwtTokenUtils {
         return jwtToken.getClaim("email");
     }
 
+    public Long getUserId(Jwt jwtToken) {
+        return jwtToken.getClaim("user_id");
+    }
+
     public boolean isTokenValid(Jwt jwtToken, UserDetails userDetails){    //check Token username is same or not in the DB username
         final String userName = getUserName(jwtToken);
         boolean isTokenExpired = getIfTokenIsExpired(jwtToken);

@@ -45,10 +45,10 @@ public class AuthService {
                         log.error("[AuthService:userSignInAuth] User :{} not found",authentication.getName());
                         return new ResponseStatusException(HttpStatus.NOT_FOUND,"USER NOT FOUND ");});
 
-            System.out.println(" userInfoEntity" +  userInfoEntity.getEmailId());
+            System.out.println(" userInfoEntityID-" +  userInfoEntity.getId());
             //log4j
 
-            String accessToken = jwtTokenGenerator.generateAccessToken(authentication , userInfoEntity.getEmailId());
+            String accessToken = jwtTokenGenerator.generateAccessToken(authentication , userInfoEntity.getId() , userInfoEntity.getEmailId());
             String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
 
             String roles = getRolesOfUser(authentication);
@@ -111,7 +111,7 @@ public class AuthService {
         Authentication authentication =  createAuthenticationObject(userInfoEntity);
 
         //Use the authentication object to generate new accessToken as the Authentication object that we will have may not contain correct role.
-        String accessToken = jwtTokenGenerator.generateAccessToken(authentication , userInfoEntity.getEmailId());
+        String accessToken = jwtTokenGenerator.generateAccessToken(authentication , userInfoEntity.getId() , userInfoEntity.getEmailId());
         log.info("AccessToken ", accessToken);
 
         System.out.println("accessToken " + accessToken);
@@ -159,7 +159,7 @@ public class AuthService {
             Authentication authentication = createAuthenticationObject(userDetailsEntity);
 
             // Generate JWT tokens
-            String accessToken = jwtTokenGenerator.generateAccessToken(authentication, userDetailsEntity.getEmailId());
+            String accessToken = jwtTokenGenerator.generateAccessToken(authentication, userDetailsEntity.getId() , userDetailsEntity.getEmailId());
             String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
 
             UserEntity savedUserDetails = userInfoRepo.save(userDetailsEntity);

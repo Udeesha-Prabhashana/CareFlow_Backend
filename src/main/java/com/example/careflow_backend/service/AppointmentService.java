@@ -8,6 +8,9 @@ import com.example.careflow_backend.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
@@ -48,6 +51,25 @@ public class AppointmentService {
         } else {
             throw new RuntimeException("No available slots for the selected date.");
         }
+    }
+
+    public List<AppointmentDto> getAllAppointments(Long userId) {
+        List<AppointmentEntity> appointments = appointmentRepository.findByPatientId(userId);
+        return appointments.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private AppointmentDto convertToDto(AppointmentEntity appointmentEntity) {
+        AppointmentDto appointmentDto = new AppointmentDto();
+        appointmentDto.setId(appointmentEntity.getId());
+        appointmentDto.setDoctorId(appointmentEntity.getDoctor().getId());
+        appointmentDto.setPatientId(appointmentEntity.getPatient().getId());
+        appointmentDto.setAppointmentDate(appointmentEntity.getAppointmentDate());
+        appointmentDto.setSlotNumber(appointmentEntity.getSlotNumber());
+        appointmentDto.setStatus(appointmentEntity.getStatus());
+        appointmentDto.setReasonForVisit(appointmentEntity.getReasonForVisit());
+        return appointmentDto;
     }
 
 }
