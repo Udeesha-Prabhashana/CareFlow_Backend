@@ -8,14 +8,18 @@ public class AppointmentDto {
     private LocalDate appointmentDate;
     private Integer slotNumber;
     private Integer status;
+
+    private Integer payment;
     private String reasonForVisit;
+
+    private  String doctorName;
 
     // Default constructor
     public AppointmentDto() {
     }
 
     // Parameterized constructor
-    public AppointmentDto(Long id, Long doctorId, Long patientId, LocalDate appointmentDate, Integer slotNumber, Integer status, String reasonForVisit) {
+    public AppointmentDto(Long id, Long doctorId, Long patientId, LocalDate appointmentDate, Integer slotNumber, Integer status, String reasonForVisit , String doctorName , Integer payment) {
         this.id = id;
         this.doctorId = doctorId;
         this.patientId = patientId;
@@ -23,9 +27,20 @@ public class AppointmentDto {
         this.slotNumber = slotNumber;
         this.status = status;
         this.reasonForVisit = reasonForVisit;
+        this.doctorName = doctorName;
+        this.payment = payment;
     }
 
     // Getters and Setters
+
+
+    public Integer getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Integer payment) {
+        this.payment = payment;
+    }
 
     public Long getId() {
         return id;
@@ -81,5 +96,13 @@ public class AppointmentDto {
 
     public void setReasonForVisit(String reasonForVisit) {
         this.reasonForVisit = reasonForVisit;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
     }
 }

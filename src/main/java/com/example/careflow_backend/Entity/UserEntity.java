@@ -59,6 +59,11 @@ public class UserEntity {
     @ToString.Exclude
     private List<DoctorAvailabilityEntity> availability;
 
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Specify cascade and fetch types
+    @JsonManagedReference
+    @ToString.Exclude
+    private List<DoctorDetailsEntity> doctorDetails;
+
     // Many-to-One relationship with RefreshTokenEntity
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference // This is the owning side of the relationship

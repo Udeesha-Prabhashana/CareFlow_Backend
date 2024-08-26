@@ -2,6 +2,7 @@ package com.example.careflow_backend.service;
 
 import com.example.careflow_backend.Entity.AppointmentEntity;
 import com.example.careflow_backend.Entity.DoctorAvailabilityEntity;
+import com.example.careflow_backend.Entity.UserEntity;
 import com.example.careflow_backend.dto.AppointmentDto;
 import com.example.careflow_backend.repository.AppointmentRepo;
 import com.example.careflow_backend.repository.UserRepo;
@@ -29,7 +30,7 @@ public class AppointmentService {
         appointmentEntity.setSlotNumber(appointmentDto.getSlotNumber());
         appointmentEntity.setStatus(appointmentDto.getStatus());
         appointmentEntity.setReasonForVisit(appointmentDto.getReasonForVisit());
-
+        appointmentEntity.setPayment(appointmentDto.getPayment());
         // Retrieve Doctor Availability for the given date
         DoctorAvailabilityEntity availability = doctorAvailabilityService.getAvailabilityForDoctorOnDate(
                 appointmentDto.getDoctorId(), appointmentDto.getAppointmentDate());
@@ -69,6 +70,12 @@ public class AppointmentService {
         appointmentDto.setSlotNumber(appointmentEntity.getSlotNumber());
         appointmentDto.setStatus(appointmentEntity.getStatus());
         appointmentDto.setReasonForVisit(appointmentEntity.getReasonForVisit());
+        appointmentDto.setPayment(appointmentEntity.getPayment());
+        // Fetch the doctor's name from the User repository using doctorId
+        UserEntity doctor = userRepository.findById(appointmentEntity.getDoctor().getId())
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+        appointmentDto.setDoctorName(doctor.getName()); // Assuming User entity has a getName() method
+
         return appointmentDto;
     }
 
