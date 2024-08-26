@@ -59,11 +59,12 @@ public class DoctorService {
             String description = (String) result[9] ;
             LocalDate availableDate = (LocalDate) result[10];
             int bookedSlots = (int) result[11];
+            Double docCharge = (Double) result [12];
 
             UserDto userDto = userDtoMap.get(id);
 
             if (userDto == null) {
-                userDto = new UserDto(id, userName, emailId, mobileNumber, address, nameResult, specializationResult, roles, photoUrl , description, new ArrayList<>());
+                userDto = new UserDto(id, userName, emailId, mobileNumber, address, nameResult, specializationResult, roles, photoUrl , description, new ArrayList<>(), docCharge);
                 userDtoMap.put(id, userDto);
             }
 

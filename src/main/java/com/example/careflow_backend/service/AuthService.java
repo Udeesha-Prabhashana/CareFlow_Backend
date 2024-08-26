@@ -6,8 +6,7 @@ import com.example.careflow_backend.config.jwtConfig.JwtTokenGenerator;
 import com.example.careflow_backend.dto.AuthResponseDto;
 import com.example.careflow_backend.dto.TokenType;
 import com.example.careflow_backend.dto.UserRegistrationDto;
-import com.example.careflow_backend.exception.UserAlreadyExistsException;
-import com.example.careflow_backend.mapper.UserInfoMapper;
+import com.example.careflow_backend.mapper.EntityMapper;
 import com.example.careflow_backend.repository.RefreshTokenRepo;
 import com.example.careflow_backend.repository.UserRepo;
 import jakarta.servlet.http.Cookie;
@@ -34,7 +33,7 @@ public class AuthService {
     private final UserRepo userInfoRepo;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepo refreshTokenRepo;
-    private final UserInfoMapper userInfoMapper;
+    private final EntityMapper entityMapper;
 
     public AuthResponseDto getJwtTokensAfterAuthentication(Authentication authentication, HttpServletResponse response) {
         try
@@ -155,7 +154,7 @@ public class AuthService {
             }
 
             // Proceed with registration
-            UserEntity userDetailsEntity = userInfoMapper.convertToEntity(userRegistrationDto);
+            UserEntity userDetailsEntity = entityMapper.convertToUserEntity(userRegistrationDto);
             Authentication authentication = createAuthenticationObject(userDetailsEntity);
 
             // Generate JWT tokens

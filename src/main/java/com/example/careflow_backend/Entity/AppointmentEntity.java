@@ -40,6 +40,9 @@ public class AppointmentEntity {
     @Column(name = "status", nullable = false)
     private Integer status;
 
+    @Column(name = "payment", nullable = false)
+    private Integer payment;
+
     @Column(name = "reason_for_visit")
     private String reasonForVisit;
 }

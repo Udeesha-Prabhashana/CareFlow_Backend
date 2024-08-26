@@ -2,6 +2,7 @@ package com.example.careflow_backend.controller;
 
 import com.example.careflow_backend.dto.UserRegistrationDto;
 import com.example.careflow_backend.service.AuthService;
+import com.example.careflow_backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.List;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
     @PostMapping("/sign-in")
     public ResponseEntity<?> authenticateUser(Authentication authentication, HttpServletResponse response){
         return ResponseEntity.ok(authService.getJwtTokensAfterAuthentication(authentication,response));
@@ -62,7 +64,28 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/sign-up/doctor")
+    public ResponseEntity<?> registerDoctor(@Valid @RequestBody UserRegistrationDto userRegistrationDto,
+                                          BindingResult bindingResult, HttpServletResponse httpServletResponse) {
+        log.info("[AuthController:registerUser] Signup Process Started for user:{}", userRegistrationDto.userName());
 
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessage = bindingResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .toList();
+            log.error("[AuthController:registerUser] Errors in user:{}", errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+
+        try {
+            return ResponseEntity.ok(userService.registerDoctor(userRegistrationDto, httpServletResponse));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            log.error("[AuthController:registerUser] Unexpected error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        }
+    }
 
 
 
