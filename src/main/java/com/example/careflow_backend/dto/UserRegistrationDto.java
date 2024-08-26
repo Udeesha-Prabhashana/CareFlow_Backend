@@ -11,6 +11,10 @@ public record UserRegistrationDto (
         String name,
         String userAddress,
 
+        String description,
+        String registrationNumber,
+
+        Double BookingCharge,
         String userSpecialization,
         @NotEmpty(message = "User email must not be empty") //Neither null nor 0 size
         @Email(message = "Invalid email format")

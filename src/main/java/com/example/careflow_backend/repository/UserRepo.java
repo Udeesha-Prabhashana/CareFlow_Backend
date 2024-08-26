@@ -18,17 +18,20 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByMobileNumber(String mobileNumber);
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.specialization,u.photoUrl, u.roles, u.description) " +
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description ,dd.BookingCharge) " +
             "FROM UserEntity u " +
+            "JOIN u.doctorDetails dd " +
             "WHERE u.roles = :role")
     List<UserDto> findByRoles(String role);
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.specialization, u.roles, u.photoUrl, da.availableDate, da.bookedSlots , u.description) " +
+
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.roles, u.photoUrl, da.availableDate, da.bookedSlots , dd.description , dd.BookingCharge) " +
             "FROM UserEntity u " +
+            "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
             "WHERE u.roles = :role " +
             "AND LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "AND LOWER(u.specialization) LIKE LOWER(CONCAT('%', :specialization, '%')) " +
+            "AND LOWER(dd.specialization) LIKE LOWER(CONCAT('%', :specialization, '%')) " +
             "AND da.availableDate = :availableDate")
     List<UserDto> findDoctorsByCriteria(
             String role,
@@ -37,30 +40,35 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
             LocalDate availableDate
     );
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address,u.name, u.specialization,u.photoUrl, u.roles, da.availableDate, da.bookedSlots , u.description) " +
+
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.bookedSlots , dd.description ,dd.BookingCharge) " +
             "FROM UserEntity u " +
+            "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
             "WHERE u.roles = :role " +
             "AND LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "AND LOWER(u.specialization) LIKE LOWER(CONCAT('%', :specialization, '%')) ")
+            "AND LOWER(dd.specialization) LIKE LOWER(CONCAT('%', :specialization, '%')) ")
     List<UserDto> findDoctorsByCriteria2(
             String role,
             String name,
             String specialization
     );
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.specialization, u.photoUrl, u.roles, da.availableDate, da.bookedSlots, u.description) " +
+
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.bookedSlots, dd.description ,dd.BookingCharge) " +
             "FROM UserEntity u " +
+            "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
             "WHERE u.roles = :role " +
-            "AND LOWER(u.specialization) LIKE LOWER(CONCAT('%', :specialization, '%')) ")
+            "AND LOWER(dd.specialization) LIKE LOWER(CONCAT('%', :specialization, '%')) ")
     List<UserDto> findDoctorsByCriteria3(
             String role,
             String specialization
     );
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.specialization,u.photoUrl, u.roles, da.availableDate, da.bookedSlots,u.description) " +
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.bookedSlots, dd.description ,dd.BookingCharge) " +
             "FROM UserEntity u " +
+            "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
             "WHERE u.roles = :role " +
             "AND LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) ")
@@ -69,20 +77,24 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
             String name
     );
 
-    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.specialization, u.photoUrl, u.roles, u.description, da.availableDate, da.bookedSlots " +
+    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description, da.availableDate, da.bookedSlots ,dd.BookingCharge " +
             "FROM UserEntity u " +
+            "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
             "WHERE u.roles = :role " +
             "AND LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<Object[]> findDoctorDetailsWithAvailability(String role, String name);
 
-    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.specialization, u.photoUrl, u.roles, u.description, da.availableDate, da.bookedSlots " +
+
+    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description, da.availableDate, da.bookedSlots, dd.BookingCharge " +
             "FROM UserEntity u " +
+            "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
             "WHERE u.roles = :role " +
-            "AND LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))"+
-            "AND LOWER(u.specialization) LIKE LOWER(CONCAT('%', :specialization, '%'))")
+            "AND LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) " +
+            "AND LOWER(dd.specialization) LIKE LOWER(CONCAT('%', :specialization, '%'))")
     List<Object[]> findDoctorDetailsWithAvailabilityAndSpecialization(String role, String name, String specialization);
+
 
 
 }

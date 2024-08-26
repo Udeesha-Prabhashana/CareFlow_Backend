@@ -23,6 +23,7 @@ public class UserDto {
     private Integer bookedSlots;
     private String description;
     private List<DoctorAvailabilityDto> availability;
+    private Double docCharge;
 
     @Data
     @AllArgsConstructor
@@ -32,7 +33,7 @@ public class UserDto {
     }
 
     // Constructor without availability details
-    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl , String description) {
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl , String description, Double docCharge) {
         this.id = id;
         this.userName = userName;
         this.emailId = emailId;
@@ -43,10 +44,11 @@ public class UserDto {
         this.roles = roles;
         this.photoUrl = photoUrl;
         this.description =description;
+        this.docCharge = docCharge;
     }
 
     // Constructor with availability details
-    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl, LocalDate availableDate, Integer bookedSlots,String description, List<DoctorAvailabilityDto> availability) {
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl, LocalDate availableDate, Integer bookedSlots,String description, List<DoctorAvailabilityDto> availability , Double docCharge) {
         this.id = id;
         this.userName = userName;
         this.emailId = emailId;
@@ -60,9 +62,10 @@ public class UserDto {
         this.bookedSlots = bookedSlots;
         this.description=description;
         this.availability = availability;
+        this.docCharge = docCharge;
     }
 
-    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl, LocalDate availableDate, Integer bookedSlots, String description) {
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl, LocalDate availableDate, Integer bookedSlots, String description ,Double docCharge) {
         this.id = id;
         this.userName = userName;
         this.emailId = emailId;
@@ -75,10 +78,11 @@ public class UserDto {
         this.availableDate = availableDate;
         this.bookedSlots = bookedSlots;
         this.description = description;
+        this.docCharge = docCharge;
     }
 
     // New Constructor to match your current usage
-    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles,String photoUrl,String description, List<DoctorAvailabilityDto> availability) {
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles,String photoUrl,String description, List<DoctorAvailabilityDto> availability , Double docCharge) {
         this.id = id;
         this.userName = userName;
         this.emailId = emailId;
@@ -90,5 +94,6 @@ public class UserDto {
         this.photoUrl = photoUrl;
         this.description = description;
         this.availability = availability;
+        this.docCharge = docCharge;
     }
 }
