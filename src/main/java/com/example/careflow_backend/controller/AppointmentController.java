@@ -41,9 +41,30 @@ public class AppointmentController {
     @PostMapping("/add_appointment")
     public ResponseEntity<String> addAppointment(@Valid @RequestBody AppointmentDto appointmentDto) {
         try {
-            // Call the service to add the appointment
-            appointmentService.addAppointment(appointmentDto);
-            return ResponseEntity.ok("Appointment created successfully");
+
+            // Access the SecurityContext to get the current authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Auth: " + authentication);
+
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+                Jwt jwt = (Jwt) authentication.getPrincipal();
+                // Extract user ID from JWT token
+                Long userId = jwtTokenUtils.getUserId(jwt);
+
+                if (userId != null) {
+                    System.out.println("UserID: " + userId);
+                    // Pass the userId to your service method
+                    // Call the service to add the appointment
+                    appointmentService.addAppointment(appointmentDto ,userId);
+                    return ResponseEntity.ok("Appointment created successfully");
+                } else {
+                    System.out.println("UserID is null");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList().toString());
+                }
+            } else {
+                System.out.println("Principal is not an instance of Jwt");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList().toString());
+            }
         } catch (Exception e) {
             // Log the exception and return an error response
             log.error("Error while creating appointment", e);

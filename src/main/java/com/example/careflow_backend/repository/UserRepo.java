@@ -25,7 +25,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     List<UserDto> findByRoles(String role);
 
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.roles, u.photoUrl, da.availableDate, da.bookedSlots , dd.description , dd.BookingCharge) " +
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.roles, u.photoUrl, da.availableDate, da.availableTime, da.totalSlots, da.bookedSlots , dd.description , dd.BookingCharge) " +
             "FROM UserEntity u " +
             "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
@@ -41,7 +41,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     );
 
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.bookedSlots , dd.description ,dd.BookingCharge) " +
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.availableTime, da.totalSlots, da.bookedSlots , dd.description ,dd.BookingCharge) " +
             "FROM UserEntity u " +
             "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
@@ -55,7 +55,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     );
 
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.bookedSlots, dd.description ,dd.BookingCharge) " +
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.availableTime, da.totalSlots, da.bookedSlots, dd.description ,dd.BookingCharge) " +
             "FROM UserEntity u " +
             "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
@@ -66,7 +66,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
             String specialization
     );
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.bookedSlots, dd.description ,dd.BookingCharge) " +
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, da.availableDate, da.availableTime, da.totalSlots, da.bookedSlots, dd.description ,dd.BookingCharge) " +
             "FROM UserEntity u " +
             "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
@@ -77,7 +77,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
             String name
     );
 
-    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description, da.availableDate, da.bookedSlots ,dd.BookingCharge " +
+    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description, da.availableDate,da.availableTime, da.totalSlots, da.bookedSlots ,dd.BookingCharge " +
             "FROM UserEntity u " +
             "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +
@@ -86,7 +86,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     List<Object[]> findDoctorDetailsWithAvailability(String role, String name);
 
 
-    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description, da.availableDate, da.bookedSlots, dd.BookingCharge " +
+    @Query("SELECT u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description, da.availableDate,da.availableTime, da.totalSlots, da.bookedSlots, dd.BookingCharge " +
             "FROM UserEntity u " +
             "JOIN u.doctorDetails dd " +
             "JOIN u.availability da " +

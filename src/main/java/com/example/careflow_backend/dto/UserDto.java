@@ -20,7 +20,9 @@ public class UserDto {
     private String roles;
     private String photoUrl;
     private LocalDate availableDate;
+    private String availableTime;
     private Integer bookedSlots;
+    private Integer totalSlots;
     private String description;
     private List<DoctorAvailabilityDto> availability;
     private Double docCharge;
@@ -29,7 +31,9 @@ public class UserDto {
     @AllArgsConstructor
     public static class DoctorAvailabilityDto {
         private LocalDate availableDate;
+        private String availableTime;
         private int bookedSlots;
+        private int TotalSlots;
     }
 
     // Constructor without availability details
@@ -65,7 +69,7 @@ public class UserDto {
         this.docCharge = docCharge;
     }
 
-    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl, LocalDate availableDate, Integer bookedSlots, String description ,Double docCharge) {
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl, LocalDate availableDate, String availableTime, Integer totalSlots, Integer bookedSlots, String description ,Double docCharge) {
         this.id = id;
         this.userName = userName;
         this.emailId = emailId;
@@ -76,6 +80,8 @@ public class UserDto {
         this.roles = roles;
         this.photoUrl = photoUrl;
         this.availableDate = availableDate;
+        this.availableTime =availableTime;
+        this.totalSlots = totalSlots;
         this.bookedSlots = bookedSlots;
         this.description = description;
         this.docCharge = docCharge;

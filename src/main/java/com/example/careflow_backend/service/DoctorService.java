@@ -58,8 +58,10 @@ public class DoctorService {
             String roles = (String) result[8];
             String description = (String) result[9] ;
             LocalDate availableDate = (LocalDate) result[10];
-            int bookedSlots = (int) result[11];
-            Double docCharge = (Double) result [12];
+            String availableTime = (String) result[11];
+            int totalSlots = (int) result[12];
+            int bookedSlots = (int) result[13];
+            Double docCharge = (Double) result [14];
 
             UserDto userDto = userDtoMap.get(id);
 
@@ -68,7 +70,7 @@ public class DoctorService {
                 userDtoMap.put(id, userDto);
             }
 
-            userDto.getAvailability().add(new UserDto.DoctorAvailabilityDto(availableDate, bookedSlots));
+            userDto.getAvailability().add(new UserDto.DoctorAvailabilityDto(availableDate,availableTime, bookedSlots, totalSlots));
         }
 
         return new ArrayList<>(userDtoMap.values());
