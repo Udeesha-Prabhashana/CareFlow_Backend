@@ -52,6 +52,8 @@ public class AuthService {
 
             String roles = getRolesOfUser(authentication);
 
+            System.out.println(" roles - " +  roles);
+
             //Let's save the refreshToken as well
             saveUserRefreshToken(userInfoEntity,refreshToken);
             creatRefreshTokenCookie(response,refreshToken);
@@ -60,7 +62,7 @@ public class AuthService {
             return  AuthResponseDto.builder()
                     .accessToken(accessToken)
                     .accessTokenExpiry(15 * 60)
-                    .userName(userInfoEntity.getUserName())
+                    .name(userInfoEntity.getName())
                     .tokenType(TokenType.Bearer)
                     .userRole(roles)       // Set the user role here
                     .build();
@@ -117,7 +119,7 @@ public class AuthService {
         return  AuthResponseDto.builder()
                 .accessToken(accessToken)
                 .accessTokenExpiry(5 * 60)
-                .userName(userInfoEntity.getUserName())
+                .name(userInfoEntity.getName())
                 .tokenType(TokenType.Bearer)
                 .build();
     }
@@ -172,7 +174,7 @@ public class AuthService {
             return AuthResponseDto.builder()
                     .accessToken(accessToken)
                     .accessTokenExpiry(5 * 60)
-                    .userName(savedUserDetails.getUserName())
+                    .name(savedUserDetails.getName())
                     .tokenType(TokenType.Bearer)
                     .userRole(roles)
                     .build();
