@@ -19,12 +19,12 @@ public class AppointmentService {
     private final UserRepo userRepository;
     private final DoctorAvailabilityService doctorAvailabilityService;
 
-    public AppointmentDto addAppointment(AppointmentDto appointmentDto) {
+    public AppointmentDto addAppointment(AppointmentDto appointmentDto , Long userId) {
         // Convert DTO to entity
         AppointmentEntity appointmentEntity = new AppointmentEntity();
         appointmentEntity.setDoctor(userRepository.findById(appointmentDto.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doctor not found")));
-        appointmentEntity.setPatient(userRepository.findById(appointmentDto.getPatientId())
+        appointmentEntity.setPatient(userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Patient not found")));
         appointmentEntity.setAppointmentDate(appointmentDto.getAppointmentDate());
         appointmentEntity.setSlotNumber(appointmentDto.getSlotNumber());
