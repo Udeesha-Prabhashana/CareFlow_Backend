@@ -73,8 +73,9 @@ public class UserService {
             UserEntity savedUserDetails = userInfoRepo.save(userDetailsEntity);
 
             DoctorDetailsEntity doctorDetailsEntity = entityMapper.convertDoctorDetailsEntity(savedUserDetails , userRegistrationDto );
+//            log.info("doctorDetailsEntity Entity: {}", doctorDetailsEntity);
             DoctorDetailsEntity savedDoctorDetails =  doctorDetailsRepo.save(doctorDetailsEntity);
-            log.info("[AuthService:registerUser] User:{} Successfully registered", savedUserDetails.getUserName());
+            log.info("[AuthService:registerDoctor] User:{} Successfully registered", savedUserDetails.getUserName());
 
             return "Doctor added successfully";
 

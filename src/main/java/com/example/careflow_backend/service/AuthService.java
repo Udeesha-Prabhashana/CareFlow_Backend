@@ -159,11 +159,15 @@ public class AuthService {
             UserEntity userDetailsEntity = entityMapper.convertToUserEntity(userRegistrationDto);
             Authentication authentication = createAuthenticationObject(userDetailsEntity);
 
-            // Generate JWT tokens
-            String accessToken = jwtTokenGenerator.generateAccessToken(authentication, userDetailsEntity.getId() , userDetailsEntity.getEmailId());
-            String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
+            log.info("User Details Entity: {}", userDetailsEntity);
 
             UserEntity savedUserDetails = userInfoRepo.save(userDetailsEntity);
+
+            // Generate JWT tokens
+            String accessToken = jwtTokenGenerator.generateAccessToken(authentication, savedUserDetails.getId() , savedUserDetails.getEmailId());
+            String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
+
+            log.info("savedUserDetails Entity: {}", savedUserDetails);
             saveUserRefreshToken(savedUserDetails, refreshToken);
 
             String roles = getRolesOfUser(authentication);
