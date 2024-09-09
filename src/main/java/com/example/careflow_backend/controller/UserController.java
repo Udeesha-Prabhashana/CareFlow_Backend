@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping({"/api", "/"})
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin("http://localhost:3000")
