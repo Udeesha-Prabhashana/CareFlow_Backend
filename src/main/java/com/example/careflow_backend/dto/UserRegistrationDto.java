@@ -11,6 +11,8 @@ public record UserRegistrationDto (
         String name,
         String userAddress,
 
+        String photoUrl,
+
         String description,
         String registrationNumber,
 
