@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -68,4 +69,13 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference // This is the owning side of the relationship
     private List<RefreshTokenEntity> refreshTokens;
+
+    @Column(nullable = false)
+    private boolean isVerified = false;
+
+    @Column
+    private String otp;
+
+    @Column
+    private LocalDateTime otpExpiry;
 }
