@@ -9,17 +9,20 @@ import com.example.careflow_backend.dto.UserRegistrationDto;
 import com.example.careflow_backend.mapper.EntityMapper;
 import com.example.careflow_backend.repository.RefreshTokenRepo;
 import com.example.careflow_backend.repository.UserRepo;
+import com.example.careflow_backend.utils.OtpUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -34,6 +37,7 @@ public class AuthService {
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepo refreshTokenRepo;
     private final EntityMapper entityMapper;
+    private final NotificationService notificationService;
 
     public AuthResponseDto getJwtTokensAfterAuthentication(Authentication authentication, HttpServletResponse response) {
         try
@@ -139,49 +143,76 @@ public class AuthService {
         return new UsernamePasswordAuthenticationToken(username, password, Arrays.asList(authorities));
     }
 
-    public AuthResponseDto registerUser(UserRegistrationDto userRegistrationDto, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<?> registerUser(UserRegistrationDto userRegistrationDto, HttpServletResponse httpServletResponse) {
         try {
             log.info("[AuthService:registerUser] User Registration Started with :::{}", userRegistrationDto);
 
-            // Check if email already exists
             Optional<UserEntity> existingUserByEmail = userInfoRepo.findByEmailId(userRegistrationDto.userEmail());
             if (existingUserByEmail.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered.");
+                UserEntity existingUser = existingUserByEmail.get();
+                // If the user is already verified, throw an error
+                log.info("[existingUser1 :::{}", existingUser);
+                if (existingUser.isVerified()) {
+                    log.info("[existingUser1- is verified........");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered and verified.");
+                }
             }
 
-            // Check if mobile number already exists
             Optional<UserEntity> existingUserByMobile = userInfoRepo.findByMobileNumber(userRegistrationDto.userMobileNo());
             if (existingUserByMobile.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Mobile number is already registered.");
+                UserEntity existingUser2 = existingUserByMobile.get();
+                log.info("[existingUser2 :::{}", existingUser2);
+                // If the user is already verified, throw an error
+                if (existingUser2.isVerified()) {
+                    log.info("[existingUser2- is verified........");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Mobile number is already registered.");
+                }
             }
 
-            // Proceed with registration
-            UserEntity userDetailsEntity = entityMapper.convertToUserEntity(userRegistrationDto);
-            Authentication authentication = createAuthenticationObject(userDetailsEntity);
+            if(existingUserByEmail.isPresent() || existingUserByMobile.isPresent()){
+                log.info("[Saving existing user starting........");
+                UserEntity existingUser = existingUserByMobile.get();
+//                UserEntity existingUser = entityMapper.convertToUserEntity(userRegistrationDto);
+                existingUser.setAddress(userRegistrationDto.userAddress());
+                existingUser.setDescription(userRegistrationDto.description());
+                existingUser.setUserName(userRegistrationDto.userName());
+                existingUser.setMobileNumber(userRegistrationDto.userMobileNo());
+                existingUser.setRoles(userRegistrationDto.userRole());
+                existingUser.setEmailId(userRegistrationDto.userEmail());
+                existingUser.setName(userRegistrationDto.name());
+                existingUser.setPassword(userRegistrationDto.userPassword());
 
-            log.info("User Details Entity: {}", userDetailsEntity);
+                String otp = OtpUtils.generateOtp(); // Utility class for OTP generation
+                LocalDateTime otpExpiry = OtpUtils.generateOtpExpiry(); // Utility class for expiry calculation
 
-            UserEntity savedUserDetails = userInfoRepo.save(userDetailsEntity);
+                existingUser.setOtp(otp);
+                existingUser.setOtpExpiry(otpExpiry);
+                userInfoRepo.save(existingUser);
 
-            // Generate JWT tokens
-            String accessToken = jwtTokenGenerator.generateAccessToken(authentication, savedUserDetails.getId() , savedUserDetails.getEmailId());
-            String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
+                String formattedPhoneNumber = formatPhoneNumber(userRegistrationDto.userMobileNo());
 
-            log.info("savedUserDetails Entity: {}", savedUserDetails);
-            saveUserRefreshToken(savedUserDetails, refreshToken);
+                // Send OTP to the user's phone number
+                notificationService.sendOtp(formattedPhoneNumber, otp);
+            } else{
+                UserEntity userDetailsEntity = entityMapper.convertToUserEntity(userRegistrationDto);
+                log.info("[Saving new user starting........");
+                // Generate OTP and expiry time
+                String otp = OtpUtils.generateOtp();
+                LocalDateTime otpExpiry = OtpUtils.generateOtpExpiry();
 
-            String roles = getRolesOfUser(authentication);
-            creatRefreshTokenCookie(httpServletResponse, refreshToken);
+                userDetailsEntity.setOtp(otp);
+                userDetailsEntity.setOtpExpiry(otpExpiry);
+                userInfoRepo.save(userDetailsEntity);
 
-            log.info("[AuthService:registerUser] User:{} Successfully registered", savedUserDetails.getUserName());
+                String formattedPhoneNumber = formatPhoneNumber(userRegistrationDto.userMobileNo());
 
-            return AuthResponseDto.builder()
-                    .accessToken(accessToken)
-                    .accessTokenExpiry(5 * 60)
-                    .name(savedUserDetails.getName())
-                    .tokenType(TokenType.Bearer)
-                    .userRole(roles)
-                    .build();
+                // Send OTP to the user's phone number
+                notificationService.sendOtp(formattedPhoneNumber, otp);
+            }
+
+            log.info("[AuthService:registerUser] OTP sent to user phone: {}", userRegistrationDto.userMobileNo());
+
+            return ResponseEntity.ok("OTP sent to your phone. Please verify to complete registration.");
 
         } catch (ResponseStatusException e) {
             log.error("[AuthService:registerUser] Registration error: {}", e.getMessage());
@@ -190,6 +221,16 @@ public class AuthService {
             log.error("[AuthService:registerUser] Unexpected error: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", e);
         }
+    }
+
+    // Function to format the phone number (removes leading zero and adds country code)
+    public String formatPhoneNumber(String mobileNumber) {
+        // Check if the number starts with '0', and replace it with '+94'
+        if (mobileNumber.startsWith("0")) {
+            return "+94" + mobileNumber.substring(1);
+        }
+        // If the number is already in correct format (e.g., +94776750158), return as is
+        return mobileNumber;
     }
 
 }
