@@ -23,11 +23,13 @@ public class UserService {
     private final UserRepo userInfoRepo;
     private final DoctorDetailsRepo doctorDetailsRepo;
     private final EntityMapper entityMapper;
+    private final UserRepo userRepo;
 
-    public UserService(UserRepo userInfoRepo, DoctorDetailsRepo doctorDetailsRepo, EntityMapper entityMapper) {
+    public UserService(UserRepo userInfoRepo, DoctorDetailsRepo doctorDetailsRepo, EntityMapper entityMapper, UserRepo userRepo) {
         this.userInfoRepo = userInfoRepo;
         this.doctorDetailsRepo = doctorDetailsRepo;
         this.entityMapper = entityMapper;
+        this.userRepo = userRepo;
     }
 
     public List<UserDto> getUsersByRole(String role) {
@@ -87,5 +89,28 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", e);
         }
     }
+
+    public UserDto getUserById(Long id) {
+        UserEntity userEntity = userRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id)
+        );
+        return new UserDto(userEntity.getName(), userEntity.getMobileNumber(), userEntity.getEmailId(), userEntity.getPhotoUrl());
+    }
+
+    public void updateUserProfile(Long userId, UserDto userDto) {
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Update fields
+        userEntity.setName(userDto.getName());
+        userEntity.setEmailId(userDto.getEmailId());
+        userEntity.setMobileNumber(userDto.getMobileNumber());
+        userEntity.setPhotoUrl(userDto.getPhotoUrl());
+
+        userRepo.save(userEntity);
+    }
+
+
+
 
 }
