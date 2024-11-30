@@ -2,6 +2,8 @@ package com.example.careflow_backend.controller;
 
 import com.example.careflow_backend.Entity.DoctorEntity;
 import com.example.careflow_backend.Entity.UserEntity;
+import com.example.careflow_backend.config.jwtConfig.JwtTokenUtils;
+import com.example.careflow_backend.dto.AppointmentDto;
 import com.example.careflow_backend.dto.DoctorFilterDto;
 import com.example.careflow_backend.dto.UserDto;
 import com.example.careflow_backend.service.DoctorService;
@@ -12,8 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +38,7 @@ public class UserController {
     @Autowired
     private UserService userService; // Ensure this is not static
     private final DoctorService doctorService;
+    private final JwtTokenUtils jwtTokenUtils;
 
 //    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/Doctors")
@@ -75,4 +83,52 @@ public class UserController {
         List<UserDto> filteredDoctors = doctorService.getFilteredDoctors(filterDto);
         return ResponseEntity.ok(filteredDoctors);
     }
+
+    @GetMapping("/getUserById")
+    public ResponseEntity<UserDto> getUserById() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Auth: " + authentication);
+
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+                Jwt jwt = (Jwt) authentication.getPrincipal();
+                // Extract user ID from JWT token
+                Long userId = jwtTokenUtils.getUserId(jwt);
+
+                if (userId != null) {
+                    System.out.println("UserID: " + userId);
+                    // Pass the userId to your service method
+                    UserDto userDto = userService.getUserById(userId);
+                    return ResponseEntity.ok(userDto);
+                } else {
+                    System.out.println("UserID is null");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Corrected
+                }
+            } else {
+                System.out.println("Principal is not an instance of Jwt");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Corrected
+            }
+        } catch (ResponseStatusException e) {
+            // Log the exception and return an error response
+            log.error("Error while fetching appointments", e);
+            return ResponseEntity.status(e.getStatusCode()).body(null); // Corrected
+        } catch (Exception e) {
+            // Return an empty list and internal server error
+            log.error("[UserController:GetAllAppointments] Unexpected error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Corrected
+        }
+    }
+
+    @PostMapping("/api/updateUserProfile")
+    public ResponseEntity<String> updateUserProfile(@RequestBody UserDto userDto, @AuthenticationPrincipal Jwt jwt) {
+        Long userId = jwtTokenUtils.getUserId(jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User ID not found in token.");
+        }
+        userService.updateUserProfile(userId, userDto);
+        return ResponseEntity.ok("Profile updated successfully.");
+    }
+
+
+
 }
