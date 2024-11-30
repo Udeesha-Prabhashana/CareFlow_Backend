@@ -102,4 +102,12 @@ public class UserDto {
         this.availability = availability;
         this.docCharge = docCharge;
     }
+
+    public UserDto(String name, String mobileNumber, String emailId, String photoUrl) {
+        this.name = name;
+        this.mobileNumber = mobileNumber;
+        this.emailId = emailId;
+        this.photoUrl = photoUrl;
+    }
+
 }
