@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  careflow-backend:
+    image: careflow-backend:latest
+    container_name: careflow-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Host port 5080 -> Container port 8080
+    env_file:
+      - .env
+    volumes:
+      # Mount the certs folder to ensure they are accessible if not bundled
+      - ./src/main/resources/certs:/app/certs
