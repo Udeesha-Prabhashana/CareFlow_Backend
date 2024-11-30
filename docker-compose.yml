@@ -8,9 +8,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080" # Host port 5080 -> Container port 8080
+      - "8080:8080"  # Host port 8080 -> Container port 8080
     env_file:
       - .env
     volumes:
-      # Mount the certs folder to ensure they are accessible if not bundled
+      - ./src/main/java:/app/src/main/java
+      - ./src/main/resources:/app/src/main/resources
       - ./src/main/resources/certs:/app/certs

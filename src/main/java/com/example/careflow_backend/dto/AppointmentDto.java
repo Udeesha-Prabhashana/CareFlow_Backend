@@ -1,4 +1,5 @@
 package com.example.careflow_backend.dto;
+
 import java.time.LocalDate;
 
 public class AppointmentDto {
@@ -12,14 +13,16 @@ public class AppointmentDto {
     private Integer payment;
     private String reasonForVisit;
 
-    private  String doctorName;
+    private String doctorName;
+
+    private PaymentDetailsDto paymentDetails;  // New field for payment details
 
     // Default constructor
     public AppointmentDto() {
     }
 
     // Parameterized constructor
-    public AppointmentDto(Long id, Long doctorId, Long patientId, LocalDate appointmentDate, Integer slotNumber, Integer status, String reasonForVisit , String doctorName , Integer payment) {
+    public AppointmentDto(Long id, Long doctorId, Long patientId, LocalDate appointmentDate, Integer slotNumber, Integer status, String reasonForVisit, String doctorName, Integer payment, PaymentDetailsDto paymentDetails) {
         this.id = id;
         this.doctorId = doctorId;
         this.patientId = patientId;
@@ -29,10 +32,10 @@ public class AppointmentDto {
         this.reasonForVisit = reasonForVisit;
         this.doctorName = doctorName;
         this.payment = payment;
+        this.paymentDetails = paymentDetails;  // Initialize payment details
     }
 
-    // Getters and Setters
-
+    // Getters and Setters for the fields
 
     public Integer getPayment() {
         return payment;
@@ -104,5 +107,13 @@ public class AppointmentDto {
 
     public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
+    }
+
+    public PaymentDetailsDto getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public void setPaymentDetails(PaymentDetailsDto paymentDetails) {
+        this.paymentDetails = paymentDetails;
     }
 }
