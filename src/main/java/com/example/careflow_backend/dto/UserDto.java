@@ -26,6 +26,7 @@ public class UserDto {
     private String description;
     private List<DoctorAvailabilityDto> availability;
     private Double docCharge;
+    private String registrationNumber;
 
     @Data
     @AllArgsConstructor
@@ -37,7 +38,7 @@ public class UserDto {
     }
 
     // Constructor without availability details
-    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl , String description, Double docCharge) {
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl , String description, Double docCharge, String registrationNumber) {
         this.id = id;
         this.userName = userName;
         this.emailId = emailId;
@@ -49,6 +50,7 @@ public class UserDto {
         this.photoUrl = photoUrl;
         this.description =description;
         this.docCharge = docCharge;
+        this.registrationNumber = registrationNumber;
     }
 
     // Constructor with availability details

@@ -21,7 +21,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByMobileNumber(String mobileNumber);
     Optional<UserEntity> findByMobileNumberAndOtp(String mobileNumber, String otp);
 
-    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.photoUrl, u.roles, dd.description ,dd.BookingCharge) " +
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, dd.specialization, u.roles,u.photoUrl, dd.description ,dd.BookingCharge , dd.registrationNumber) " +
             "FROM UserEntity u " +
             "JOIN u.doctorDetails dd " +
             "WHERE u.roles = :role")

@@ -6,6 +6,9 @@ target/
 # Ignore application.properties
 !**/src/main/resources/application.properties
 
+# Ignore the .env file
+.env
+
 ### STS ###
 .apt_generated
 .classpath
