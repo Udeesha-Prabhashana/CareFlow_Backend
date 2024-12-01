@@ -129,6 +129,19 @@ public class UserController {
         return ResponseEntity.ok("Profile updated successfully.");
     }
 
-
-
+    @PostMapping("/Doctors/{userId}")
+    public ResponseEntity<String> deleteDoctor(@PathVariable Long userId) {
+        try {
+            doctorService.deleteDoctorById(userId); // Assuming this method handles deletion
+            return ResponseEntity.ok("Doctor deleted successfully");
+        } catch (ResponseStatusException e) {
+            // Handle specific exceptions that provide a meaningful status and message
+            log.error("Error deleting doctor: {}", e.getReason());
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            log.error("Unexpected error while deleting doctor: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
+    }
 }

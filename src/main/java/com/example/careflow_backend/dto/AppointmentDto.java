@@ -17,6 +17,8 @@ public class AppointmentDto {
 
     private PaymentDetailsDto paymentDetails;  // New field for payment details
 
+    private String patientName;
+
     // Default constructor
     public AppointmentDto() {
     }
@@ -36,6 +38,15 @@ public class AppointmentDto {
     }
 
     // Getters and Setters for the fields
+
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
 
     public Integer getPayment() {
         return payment;

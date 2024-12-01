@@ -66,6 +66,19 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    public List<AppointmentDto> getAllAppointmentsByAdmin() {
+        List<AppointmentEntity> appointments = appointmentRepository.findAll();
+        return appointments.stream()
+                .map(appointment -> {
+                    AppointmentDto appointmentDto = convertToDto(appointment);
+                    // Extract patient name and set it in the AppointmentDto
+                    String patientName = appointment.getPatient() != null ? appointment.getPatient().getName() : null;
+                    appointmentDto.setPatientName(patientName);
+                    return appointmentDto;
+                })
+                .collect(Collectors.toList());
+    }
+
     private AppointmentDto convertToDto(AppointmentEntity appointmentEntity) {
         AppointmentDto appointmentDto = new AppointmentDto();
         appointmentDto.setId(appointmentEntity.getId());
