@@ -35,9 +35,14 @@ public class UserService {
     public List<UserDto> getUsersByRole(String role) {
         try {
             log.info("[AuthService:getUsersByRole] Fetching users with role: {}", role);
-
-            // Fetch users by role
-            List<UserDto> users = userInfoRepo.findByRoles(role);
+            List<UserDto> users;
+            if ("ROLE_DOCTOR".equalsIgnoreCase(role)) {
+                // Fetch detailed doctor data
+                users = userRepo.findDoctorsByRole(role);
+            } else {
+                // Fetch general user data
+                users = userRepo.findUsersByRole(role);
+            }
 
             if (users.isEmpty()) {
                 log.info("[AuthService:getUsersByRole] No users found with role: {}", role);
@@ -52,6 +57,27 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", e);
         }
     }
+
+//    public List<UserDto> getUsersByRoleUser(String role) {
+//        try {
+//            log.info("[AuthService:getUsersByRole] Fetching users with role: {}", role);
+//
+//            // Fetch users by role
+//            List<UserDto> users = userInfoRepo.findByRoles(role);
+//
+//            if (users.isEmpty()) {
+//                log.info("[AuthService:getUsersByRole] No users found with role: {}", role);
+//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found with the specified role.");
+//            }
+//
+//            log.info("[AuthService:getUsersByRole] Found {} users with role: {}", users.size(), role);
+//            return users;
+//
+//        } catch (Exception e) {
+//            log.error("[AuthService:getUsersByRole] Unexpected error: {}", e.getMessage());
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", e);
+//        }
+//    }
 
     public String registerDoctor(UserRegistrationDto userRegistrationDto, HttpServletResponse httpServletResponse) {
         try {
