@@ -53,6 +53,18 @@ public class UserDto {
         this.registrationNumber = registrationNumber;
     }
 
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String roles, String photoUrl) {
+        this.id = id;
+        this.userName = userName;
+        this.emailId = emailId;
+        this.mobileNumber = mobileNumber;
+        this.address = address;
+        this.name = name;
+        this.roles = roles;
+        this.photoUrl = photoUrl;
+    }
+
+
     // Constructor with availability details
     public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl, LocalDate availableDate, Integer bookedSlots,String description, List<DoctorAvailabilityDto> availability , Double docCharge) {
         this.id = id;
