@@ -58,6 +58,23 @@ public class UserController {
         }
     }
 
+    @GetMapping("/Patients")
+    public ResponseEntity<List<UserDto>> getPatients() {
+        try {
+            String role = "ROLE_USER";
+            List<UserDto> users = userService.getUsersByRole(role);
+            return ResponseEntity.ok(users);
+        } catch (ResponseStatusException e) {
+            // Return an empty list and appropriate status code
+            log.error("[UserController:getDoctors] Error occurred: {}", e.getMessage());
+            return ResponseEntity.status(e.getStatusCode()).body(Collections.emptyList());
+        } catch (Exception e) {
+            // Return an empty list and internal server error
+            log.error("[UserController:getDoctors] Unexpected error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
+    }
+
     @GetMapping("/getAllFilteredDoctors")
     public ResponseEntity<List<UserDto>> getAllFilteredDoctors(@RequestParam(required = false) String roles,
                                                                     @RequestParam(required = false) String name,
@@ -129,6 +146,19 @@ public class UserController {
         return ResponseEntity.ok("Profile updated successfully.");
     }
 
-
-
+    @PostMapping("/Doctors/{userId}")
+    public ResponseEntity<String> deleteDoctor(@PathVariable Long userId) {
+        try {
+            doctorService.deleteDoctorById(userId); // Assuming this method handles deletion
+            return ResponseEntity.ok("Doctor deleted successfully");
+        } catch (ResponseStatusException e) {
+            // Handle specific exceptions that provide a meaningful status and message
+            log.error("Error deleting doctor: {}", e.getReason());
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            log.error("Unexpected error while deleting doctor: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
+    }
 }
