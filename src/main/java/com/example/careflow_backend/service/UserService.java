@@ -2,12 +2,14 @@ package com.example.careflow_backend.service;
 
 import com.example.careflow_backend.Entity.DoctorDetailsEntity;
 import com.example.careflow_backend.Entity.NurseDetailsEntity;
+import com.example.careflow_backend.Entity.ReceptionistDetailsEntity;
 import com.example.careflow_backend.Entity.UserEntity;
 import com.example.careflow_backend.dto.UserDto;
 import com.example.careflow_backend.dto.UserRegistrationDto;
 import com.example.careflow_backend.mapper.EntityMapper;
 import com.example.careflow_backend.repository.DoctorDetailsRepo;
 import com.example.careflow_backend.repository.NurseDetailsRepo;
+import com.example.careflow_backend.repository.ReceptionistDetailsRepo;
 import com.example.careflow_backend.repository.UserRepo;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +31,15 @@ public class UserService {
     private final EntityMapper entityMapper;
     private final UserRepo userRepo;
 
-    public UserService(UserRepo userInfoRepo, DoctorDetailsRepo doctorDetailsRepo, NurseDetailsRepo nurseDetailsRepo, EntityMapper entityMapper, UserRepo userRepo) {
+    private ReceptionistDetailsRepo receptionistDetailsRepo;
+
+    public UserService(UserRepo userInfoRepo, DoctorDetailsRepo doctorDetailsRepo, NurseDetailsRepo nurseDetailsRepo, EntityMapper entityMapper, UserRepo userRepo , ReceptionistDetailsRepo receptionistDetailsRepo) {
         this.userInfoRepo = userInfoRepo;
         this.doctorDetailsRepo = doctorDetailsRepo;
         this.nurseDetailsRepo = nurseDetailsRepo;
         this.entityMapper = entityMapper;
         this.userRepo = userRepo;
+        this.receptionistDetailsRepo= receptionistDetailsRepo;
     }
 
     public List<UserDto> getUsersByRole(String role) {
@@ -47,6 +52,9 @@ public class UserService {
             } else if("ROLE_NURSE".equalsIgnoreCase(role)) {
                 // Fetch general user data
                 users = userRepo.findNurseByRole(role);
+            }else if("ROLE_RECEP".equalsIgnoreCase(role)) {
+                // Fetch general user data
+                users = userRepo.findReceptionByRole(role);
             }else{
                 users = userRepo.findUsersByRole(role);
             }
@@ -160,6 +168,43 @@ public class UserService {
         }
     }
 
+    public String registerReceptionist(UserRegistrationDto userRegistrationDto, HttpServletResponse httpServletResponse) {
+        try {
+            log.info("[AuthService:registerReceptionist] Registration Started with :::{}", userRegistrationDto);
+
+            // Check if email already exists
+            Optional<UserEntity> existingUserByEmail = userInfoRepo.findByEmailId(userRegistrationDto.userEmail());
+            if (existingUserByEmail.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered.");
+            }
+
+            // Check if mobile number already exists
+            Optional<UserEntity> existingUserByMobile = userInfoRepo.findByMobileNumber(userRegistrationDto.userMobileNo());
+            if (existingUserByMobile.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Mobile number is already registered.");
+            }
+
+            // Proceed with registration
+            UserEntity userEntity = entityMapper.convertToUserEntity(userRegistrationDto);
+            UserEntity savedUserEntity = userInfoRepo.save(userEntity);
+
+            ReceptionistDetailsEntity receptionistDetailsEntity = entityMapper.convertReceptionistDetailsEntity(savedUserEntity, userRegistrationDto);
+            ReceptionistDetailsEntity savedReceptionistDetails = receptionistDetailsRepo.save(receptionistDetailsEntity);
+
+            log.info("[AuthService:registerReceptionist] Receptionist:{} Successfully registered", savedUserEntity.getUserName());
+
+            return "Receptionist added successfully";
+
+        } catch (ResponseStatusException e) {
+            log.error("[AuthService:registerReceptionist] Registration error: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("[AuthService:registerReceptionist] Unexpected error: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", e);
+        }
+    }
+
+
 
     public UserDto getUserById(Long id) {
         UserEntity userEntity = userRepo.findById(id).orElseThrow(() ->
@@ -182,9 +227,5 @@ public class UserService {
 
         userRepo.save(userEntity);
     }
-
-
-
-
 
 }

@@ -70,6 +70,11 @@ public class UserEntity {
     @ToString.Exclude
     private List<NurseDetailsEntity> nurseDetails;
 
+    @OneToMany(mappedBy = "receptionist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @ToString.Exclude
+    private List<ReceptionistDetailsEntity> receptionDetails;
+
     // Many-to-One relationship with RefreshTokenEntity
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference // This is the owning side of the relationship

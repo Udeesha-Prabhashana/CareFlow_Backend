@@ -9,6 +9,7 @@ import com.example.careflow_backend.repository.DoctorDetailsRepo;
 import com.example.careflow_backend.repository.PaymentDetailsRepo;
 import com.example.careflow_backend.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AppointmentService {
     private final AppointmentRepo appointmentRepository;
@@ -23,6 +25,7 @@ public class AppointmentService {
     private final DoctorAvailabilityService doctorAvailabilityService;
     private final PaymentDetailsRepo paymentDetailsRepository;
     private final DoctorDetailsRepo doctorDetailsRepo;
+    private final NotificationService notificationService;
 
     public AppointmentDto addAppointment(AppointmentDto appointmentDto, Long userId) {
         // Convert DTO to entity
@@ -36,6 +39,7 @@ public class AppointmentService {
         appointmentEntity.setStatus(appointmentDto.getStatus());
         appointmentEntity.setReasonForVisit(appointmentDto.getReasonForVisit());
         appointmentEntity.setPayment(appointmentDto.getPayment());
+
         // Retrieve Doctor Availability for the given date
         DoctorAvailabilityEntity availability = doctorAvailabilityService.getAvailabilityForDoctorOnDate(
                 appointmentDto.getDoctorId(), appointmentDto.getAppointmentDate());
@@ -43,13 +47,37 @@ public class AppointmentService {
         System.out.println("Availability" + availability);
 
         // Check if slots are available
-        if (availability != null && availability.getBookedSlots() < availability.getTotalSlots() && availability.getBookedSlots() +1 == appointmentDto.getSlotNumber()) {
+        if (availability != null && availability.getBookedSlots() < availability.getTotalSlots() &&
+                availability.getBookedSlots() + 1 == appointmentDto.getSlotNumber()) {
+
             // Increment the booked slots and save the availability
             availability.setBookedSlots(availability.getBookedSlots() + 1);
             doctorAvailabilityService.saveAvailability(availability);
 
             // Save the appointment entity to the database
             AppointmentEntity savedAppointment = appointmentRepository.save(appointmentEntity);
+
+            // Send confirmation message to the user
+            try {
+                String userPhoneNumber = appointmentEntity.getPatient().getMobileNumber();
+                if (userPhoneNumber == null || userPhoneNumber.isEmpty()) {
+                    throw new RuntimeException("User phone number is missing.");
+                }
+                String formattedPhoneNumber = notificationService.formatPhoneNumber(userPhoneNumber);
+
+                String message = String.format("Dear %s, your appointment with Dr. %s is confirmed for %s at slot %d. Reason: %s. Thank you!",
+                        appointmentEntity.getPatient().getName(),
+                        appointmentEntity.getDoctor().getName(),
+                        appointmentEntity.getAppointmentDate().toString(),
+                        appointmentEntity.getSlotNumber(),
+                        appointmentEntity.getReasonForVisit());
+
+                notificationService.sendMessage(formattedPhoneNumber, message);
+                log.info("Appointment confirmation message sent to user: {}", formattedPhoneNumber);
+            } catch (Exception e) {
+                log.error("Error while sending appointment confirmation message: {}", e.getMessage());
+                throw new RuntimeException("Failed to send appointment confirmation message.", e);
+            }
 
             // Convert the saved entity back to DTO
             appointmentDto.setId(savedAppointment.getId());
@@ -59,9 +87,11 @@ public class AppointmentService {
         }
     }
 
+
     public List<AppointmentDto> getAllAppointments(Long userId) {
         List<AppointmentEntity> appointments = appointmentRepository.findByPatientId(userId);
         return appointments.stream()
+                .filter(appointment -> appointment.getIsCancelled() == null || !appointment.getIsCancelled()) // Handle nulls gracefully
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -137,6 +167,7 @@ public class AppointmentService {
                 .map(a -> new AppointmentDto(a.getId(), a.getPatient().getName(), a.getAppointmentDate(), a.getSlotNumber()))
                 .collect(Collectors.toList());
     }
+
     public AppointmentDto addAppointmentWithPay(AppointmentDto appointmentDto, Long userId) {
         // Create the AppointmentEntity
         AppointmentEntity appointment = new AppointmentEntity();
@@ -179,6 +210,33 @@ public class AppointmentService {
 
             paymentDetailsRepository.save(paymentDetails);
 
+            // Send confirmation message to the user
+            try {
+                String userPhoneNumber = savedAppointment.getPatient().getMobileNumber();
+                if (userPhoneNumber == null || userPhoneNumber.isEmpty()) {
+                    throw new RuntimeException("User phone number is missing.");
+                }
+                String formattedPhoneNumber = notificationService.formatPhoneNumber(userPhoneNumber);
+
+                String message = String.format(
+                        "Dear %s, your appointment with Dr. %s is confirmed for %s at slot %d. " +
+                                "Payment of Rs. %.2f has been successfully received. Thank you!",
+                        savedAppointment.getPatient().getName(),
+                        savedAppointment.getDoctor().getName(),
+                        savedAppointment.getAppointmentDate().toString(),
+                        savedAppointment.getSlotNumber(),
+                        savedAppointment.getReasonForVisit(),
+                        paymentDetails.getAmountPaid().doubleValue() // Cast to double
+                );
+
+
+                notificationService.sendMessage(formattedPhoneNumber, message);
+                log.info("Appointment confirmation message sent to user: {}", formattedPhoneNumber);
+            } catch (Exception e) {
+                log.error("Error while sending appointment confirmation message: {}", e.getMessage());
+                throw new RuntimeException("Failed to send appointment confirmation message.", e);
+            }
+
             // Convert the saved appointment to DTO and return
             appointmentDto.setId(savedAppointment.getId());
             appointmentDto.setPaymentDetails(paymentDetailsDto);
@@ -187,6 +245,44 @@ public class AppointmentService {
             throw new RuntimeException("No available slots for the selected date.");
         }
     }
+
+    public void cancelAppointment(Long appointmentId) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        if (appointment.getIsCancelled()) { // Updated
+            throw new RuntimeException("Appointment is already canceled");
+        }
+
+        // Update the slot availability
+        DoctorAvailabilityEntity availability = doctorAvailabilityService.getAvailabilityForDoctorOnDate(
+                appointment.getDoctor().getId(), appointment.getAppointmentDate());
+
+        if (availability != null) {
+            availability.setBookedSlots(availability.getBookedSlots() - 1);
+            doctorAvailabilityService.saveAvailability(availability);
+        }
+
+        // Mark the appointment as canceled
+        appointment.setIsCancelled(true);
+        appointmentRepository.save(appointment);
+
+        try {
+            String userPhoneNumber = appointment.getPatient().getMobileNumber();
+            String formattedPhoneNumber = notificationService.formatPhoneNumber(userPhoneNumber);
+
+            String message = String.format("Dear %s, your appointment with Dr. %s on %s has been canceled.",
+                    appointment.getPatient().getName(),
+                    appointment.getDoctor().getName(),
+                    appointment.getAppointmentDate().toString());
+
+            notificationService.sendMessage(formattedPhoneNumber, message);
+            log.info("Cancellation message sent to user: {}", formattedPhoneNumber);
+        } catch (Exception e) {
+            log.error("Error while sending cancellation message: {}", e.getMessage());
+        }
+    }
+
 
     public AppointmentDetailsDto getAppointmentDetails(Long appointmentId) {
         // Fetch appointment details
