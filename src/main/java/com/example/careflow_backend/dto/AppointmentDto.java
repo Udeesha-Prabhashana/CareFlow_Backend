@@ -13,6 +13,7 @@ public class AppointmentDto {
     private String reasonForVisit;
 
     private  String doctorName;
+    private String patientName;
 
     // Default constructor
     public AppointmentDto() {
@@ -31,6 +32,12 @@ public class AppointmentDto {
         this.payment = payment;
     }
 
+    public AppointmentDto(Long id, String patientName, LocalDate appointmentDate, Integer slotNumber) {
+        this.id = id;
+        this.patientName = patientName;
+        this.appointmentDate = appointmentDate;
+        this.slotNumber = slotNumber;
+    }
     // Getters and Setters
 
 

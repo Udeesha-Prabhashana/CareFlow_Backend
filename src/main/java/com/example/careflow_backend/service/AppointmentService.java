@@ -19,7 +19,7 @@ public class AppointmentService {
     private final UserRepo userRepository;
     private final DoctorAvailabilityService doctorAvailabilityService;
 
-    public AppointmentDto addAppointment(AppointmentDto appointmentDto , Long userId) {
+    public AppointmentDto addAppointment(AppointmentDto appointmentDto, Long userId) {
         // Convert DTO to entity
         AppointmentEntity appointmentEntity = new AppointmentEntity();
         appointmentEntity.setDoctor(userRepository.findById(appointmentDto.getDoctorId())
@@ -31,14 +31,16 @@ public class AppointmentService {
         appointmentEntity.setStatus(appointmentDto.getStatus());
         appointmentEntity.setReasonForVisit(appointmentDto.getReasonForVisit());
         appointmentEntity.setPayment(appointmentDto.getPayment());
+
         // Retrieve Doctor Availability for the given date
         DoctorAvailabilityEntity availability = doctorAvailabilityService.getAvailabilityForDoctorOnDate(
                 appointmentDto.getDoctorId(), appointmentDto.getAppointmentDate());
 
-        System.out.println("Availability" + availability);
+        System.out.println("Availability: " + availability);
 
         // Check if slots are available
-        if (availability != null && availability.getBookedSlots() < availability.getTotalSlots() && availability.getBookedSlots() +1 == appointmentDto.getSlotNumber()) {
+        if (availability != null && availability.getBookedSlots() < availability.getTotalSlots() &&
+                availability.getBookedSlots() + 1 == appointmentDto.getSlotNumber()) {
             // Increment the booked slots and save the availability
             availability.setBookedSlots(availability.getBookedSlots() + 1);
             doctorAvailabilityService.saveAvailability(availability);
@@ -61,6 +63,26 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    public List<AppointmentDto> getAllAppointmentsDoctor(Long userId) {
+        List<AppointmentEntity> appointments = appointmentRepository.findByDoctorId(userId);
+        return appointments.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public int getAppointmentCount(Long doctorId, String type) {
+        switch (type) {
+            case "ong_appointments":
+                return appointmentRepository.countByDoctorIdAndStatus(doctorId, 1); // Ongoing
+            case "upcom_appointments":
+                return appointmentRepository.countByDoctorIdAndStatus(doctorId, 0); // Upcoming
+            case "miss_appointments":
+                return appointmentRepository.countByDoctorIdAndStatus(doctorId, -1); // Missed
+            default:
+                throw new IllegalArgumentException("Invalid appointment type: " + type);
+        }
+    }
+
     private AppointmentDto convertToDto(AppointmentEntity appointmentEntity) {
         AppointmentDto appointmentDto = new AppointmentDto();
         appointmentDto.setId(appointmentEntity.getId());
@@ -71,12 +93,33 @@ public class AppointmentService {
         appointmentDto.setStatus(appointmentEntity.getStatus());
         appointmentDto.setReasonForVisit(appointmentEntity.getReasonForVisit());
         appointmentDto.setPayment(appointmentEntity.getPayment());
+
         // Fetch the doctor's name from the User repository using doctorId
         UserEntity doctor = userRepository.findById(appointmentEntity.getDoctor().getId())
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
-        appointmentDto.setDoctorName(doctor.getName()); // Assuming User entity has a getName() method
+        appointmentDto.setDoctorName(doctor.getName());
 
         return appointmentDto;
     }
 
+    public List<AppointmentDto> getHistory(Long doctorId) {
+        return appointmentRepository.findHistory(doctorId)
+                .stream()
+                .map(a -> new AppointmentDto(a.getId(), a.getPatient().getName(), a.getAppointmentDate(), a.getSlotNumber()))
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDto> getToday(Long doctorId) {
+        return appointmentRepository.findToday(doctorId)
+                .stream()
+                .map(a -> new AppointmentDto(a.getId(), a.getPatient().getName(), a.getAppointmentDate(), a.getSlotNumber()))
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDto> getUpcoming(Long doctorId) {
+        return appointmentRepository.findUpcoming(doctorId)
+                .stream()
+                .map(a -> new AppointmentDto(a.getId(), a.getPatient().getName(), a.getAppointmentDate(), a.getSlotNumber()))
+                .collect(Collectors.toList());
+    }
 }

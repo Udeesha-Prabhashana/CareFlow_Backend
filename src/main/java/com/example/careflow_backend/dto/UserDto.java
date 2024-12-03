@@ -103,11 +103,20 @@ public class UserDto {
         this.docCharge = docCharge;
     }
 
-    public UserDto(String name, String mobileNumber, String emailId, String photoUrl) {
+//    public UserDto(String name, String mobileNumber, String emailId, String photoUrl) {
+//        this.name = name;
+//        this.mobileNumber = mobileNumber;
+//        this.emailId = emailId;
+//        this.photoUrl = photoUrl;
+//    }
+
+    public UserDto(String name, String mobileNumber, String emailId, String photoUrl, String specialization, String description) {
         this.name = name;
         this.mobileNumber = mobileNumber;
         this.emailId = emailId;
         this.photoUrl = photoUrl;
+        this.specialization = specialization;
+        this.description = description;
     }
 
 }
