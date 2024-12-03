@@ -23,6 +23,8 @@ public record UserRegistrationDto (
 
         String department,
 
+        String shift,
+
 
         @NotEmpty(message = "User email must not be empty") //Neither null nor 0 size
         @Email(message = "Invalid email format")

@@ -45,4 +45,8 @@ public class AppointmentEntity {
 
     @Column(name = "reason_for_visit")
     private String reasonForVisit;
+
+    @Column(name = "is_cancelled")
+    private Boolean isCancelled;
+
 }

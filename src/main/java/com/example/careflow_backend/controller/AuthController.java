@@ -170,6 +170,30 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
         }
     }
+
+    @PostMapping("/sign-up/Receptionists")
+    public ResponseEntity<?> registerReceptionist(@Valid @RequestBody UserRegistrationDto userRegistrationDto,
+                                                  BindingResult bindingResult, HttpServletResponse httpServletResponse) {
+        log.info("[AuthController:registerReceptionist] Signup Process Started for receptionist:{}", userRegistrationDto.userName());
+
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessage = bindingResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .toList();
+            log.error("[AuthController:registerReceptionist] Errors in receptionist registration:{}", errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+
+        try {
+            return ResponseEntity.ok(userService.registerReceptionist(userRegistrationDto, httpServletResponse));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            log.error("[AuthController:registerReceptionist] Unexpected error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        }
+    }
+
 }
 
 //We can get the access token using refresh token. after we logout using the that refresh token. we can not get again access token using that same refresh token

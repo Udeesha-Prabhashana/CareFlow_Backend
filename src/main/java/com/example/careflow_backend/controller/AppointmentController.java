@@ -111,6 +111,19 @@ public class AppointmentController {
         }
     }
 
+    @PostMapping("/{appointmentId}/cancel")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId) {
+        try {
+            appointmentService.cancelAppointment(appointmentId);
+            return ResponseEntity.ok("Appointment canceled successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to cancel appointment: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/Appointments")
     public ResponseEntity<List<AppointmentDto>> GetAllAppointmentsByAdmin() {
         try {

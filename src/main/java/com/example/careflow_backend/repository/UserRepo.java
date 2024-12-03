@@ -33,6 +33,12 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
             "WHERE u.roles = :role")
     List<UserDto> findNurseByRole(String role);
 
+    @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.roles, u.photoUrl, dd.description, dd.department) " +
+            "FROM UserEntity u " +
+            "JOIN u.receptionDetails dd " +
+            "WHERE u.roles = :role")
+    List<UserDto> findReceptionByRole(String role);
+
     @Query("SELECT new com.example.careflow_backend.dto.UserDto(u.id, u.userName, u.emailId, u.mobileNumber, u.address, u.name, u.roles, u.photoUrl) " +
             "FROM UserEntity u WHERE u.roles = :role")
     List<UserDto> findUsersByRole(String role);
