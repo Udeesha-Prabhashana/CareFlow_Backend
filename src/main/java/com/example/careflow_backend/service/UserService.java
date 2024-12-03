@@ -120,7 +120,7 @@ public class UserService {
         UserEntity userEntity = userRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id)
         );
-        return new UserDto(userEntity.getName(), userEntity.getMobileNumber(), userEntity.getEmailId(), userEntity.getPhotoUrl());
+        return new UserDto(userEntity.getName(), userEntity.getMobileNumber(), userEntity.getEmailId(), userEntity.getPhotoUrl(), userEntity.getSpecialization(), userEntity.getDescription());
     }
 
     public void updateUserProfile(Long userId, UserDto userDto) {
@@ -132,9 +132,12 @@ public class UserService {
         userEntity.setEmailId(userDto.getEmailId());
         userEntity.setMobileNumber(userDto.getMobileNumber());
         userEntity.setPhotoUrl(userDto.getPhotoUrl());
+        userEntity.setSpecialization(userDto.getSpecialization());
+        userEntity.setDescription(userDto.getDescription());
 
         userRepo.save(userEntity);
     }
+
 
 
 

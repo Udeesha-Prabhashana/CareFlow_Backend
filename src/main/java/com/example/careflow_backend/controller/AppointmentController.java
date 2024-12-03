@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -186,5 +187,110 @@ public class AppointmentController {
     public ResponseEntity<AppointmentDetailsDto> getAppointmentDetails(@PathVariable Long id) {
         AppointmentDetailsDto details = appointmentService.getAppointmentDetails(id);
         return ResponseEntity.ok(details);
+    }
+
+    @GetMapping("/get_allAppointment/doctor")
+    public ResponseEntity<List<AppointmentDto>> GetAllAppointmentsForDoctors() {
+        try {
+            // Access the SecurityContext to get the current authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Auth: " + authentication);
+
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+                Jwt jwt = (Jwt) authentication.getPrincipal();
+                // Extract user ID from JWT token
+                Long userId = jwtTokenUtils.getUserId(jwt);
+
+                if (userId != null) {
+                    System.out.println("UserID: " + userId);
+                    // Pass the userId to your service method
+                    List<AppointmentDto> appointmentDto = appointmentService.getAllAppointmentsDoctor(userId);
+                    return ResponseEntity.ok(appointmentDto);
+                } else {
+                    System.out.println("UserID is null");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+                }
+            } else {
+                System.out.println("Principal is not an instance of Jwt");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+            }
+        } catch (ResponseStatusException e) {
+            // Log the exception and return an error response
+            log.error("Error while fetching appointments", e);
+            return ResponseEntity.status(e.getStatusCode()).body(Collections.emptyList());
+        } catch (Exception e) {
+            // Return an empty list and internal server error
+            log.error("[UserController:GetAllAppointments] Unexpected error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
+    }
+
+    @GetMapping("/get_appointments/{type}")
+    public ResponseEntity<Map<String, Integer>> getAppointmentsCount(@PathVariable String type) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+                Jwt jwt = (Jwt) authentication.getPrincipal();
+                Long doctorId = jwtTokenUtils.getUserId(jwt);
+
+                log.info("Fetching appointment count for doctorId: {}", doctorId);
+                int count = appointmentService.getAppointmentCount(doctorId, type);
+                return ResponseEntity.ok(Collections.singletonMap("count", count));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyMap());
+            }
+        } catch (Exception e) {
+            log.error("Error while fetching appointment count", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyMap());
+        }
+    }
+
+
+    private Long getDoctorId() {
+        try {
+            // Get the authentication object from the SecurityContext
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            // Check if the authentication object is valid and contains a JWT token
+            if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+                Jwt jwt = (Jwt) authentication.getPrincipal();
+
+                // Use jwtTokenUtils to extract the user ID (assumed to be doctorId here)
+                Long doctorId = jwtTokenUtils.getUserId(jwt);
+
+                // Log the doctor ID for debugging purposes
+                log.info("Authenticated doctor ID: {}", doctorId);
+
+                // Return the doctor ID
+                return doctorId;
+            } else {
+                // Log and throw an exception if authentication is invalid
+                log.error("Authentication is invalid or missing JWT token.");
+                throw new RuntimeException("Unauthorized: JWT token is invalid or missing.");
+            }
+        } catch (Exception e) {
+            // Handle any unexpected exceptions and rethrow
+            log.error("Error retrieving doctor ID from authentication context.", e);
+            throw new RuntimeException("Unable to retrieve doctor ID from authentication context.", e);
+        }
+    }
+
+
+    @GetMapping("/appointments/history")
+    public ResponseEntity<List<AppointmentDto>> getHistory() {
+        Long doctorId = getDoctorId();
+        return ResponseEntity.ok(appointmentService.getHistory(doctorId));
+    }
+
+    @GetMapping("/appointments/today")
+    public ResponseEntity<List<AppointmentDto>> getToday() {
+        Long doctorId = getDoctorId();
+        return ResponseEntity.ok(appointmentService.getToday(doctorId));
+    }
+
+    @GetMapping("/appointments/upcoming")
+    public ResponseEntity<List<AppointmentDto>> getUpcoming() {
+        Long doctorId = getDoctorId();
+        return ResponseEntity.ok(appointmentService.getUpcoming(doctorId));
     }
 }

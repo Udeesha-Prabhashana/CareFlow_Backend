@@ -24,7 +24,7 @@ public class AppointmentService {
     private final PaymentDetailsRepo paymentDetailsRepository;
     private final DoctorDetailsRepo doctorDetailsRepo;
 
-    public AppointmentDto addAppointment(AppointmentDto appointmentDto , Long userId) {
+    public AppointmentDto addAppointment(AppointmentDto appointmentDto, Long userId) {
         // Convert DTO to entity
         AppointmentEntity appointmentEntity = new AppointmentEntity();
         appointmentEntity.setDoctor(userRepository.findById(appointmentDto.getDoctorId())
@@ -79,6 +79,26 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    public List<AppointmentDto> getAllAppointmentsDoctor(Long userId) {
+        List<AppointmentEntity> appointments = appointmentRepository.findByDoctorId(userId);
+        return appointments.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public int getAppointmentCount(Long doctorId, String type) {
+        switch (type) {
+            case "ong_appointments":
+                return appointmentRepository.countByDoctorIdAndStatus(doctorId, 1); // Ongoing
+            case "upcom_appointments":
+                return appointmentRepository.countByDoctorIdAndStatus(doctorId, 0); // Upcoming
+            case "miss_appointments":
+                return appointmentRepository.countByDoctorIdAndStatus(doctorId, -1); // Missed
+            default:
+                throw new IllegalArgumentException("Invalid appointment type: " + type);
+        }
+    }
+
     private AppointmentDto convertToDto(AppointmentEntity appointmentEntity) {
         AppointmentDto appointmentDto = new AppointmentDto();
         appointmentDto.setId(appointmentEntity.getId());
@@ -97,6 +117,26 @@ public class AppointmentService {
         return appointmentDto;
     }
 
+    public List<AppointmentDto> getHistory(Long doctorId) {
+        return appointmentRepository.findHistory(doctorId)
+                .stream()
+                .map(a -> new AppointmentDto(a.getId(), a.getPatient().getName(), a.getAppointmentDate(), a.getSlotNumber()))
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDto> getToday(Long doctorId) {
+        return appointmentRepository.findToday(doctorId)
+                .stream()
+                .map(a -> new AppointmentDto(a.getId(), a.getPatient().getName(), a.getAppointmentDate(), a.getSlotNumber()))
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDto> getUpcoming(Long doctorId) {
+        return appointmentRepository.findUpcoming(doctorId)
+                .stream()
+                .map(a -> new AppointmentDto(a.getId(), a.getPatient().getName(), a.getAppointmentDate(), a.getSlotNumber()))
+                .collect(Collectors.toList());
+    }
     public AppointmentDto addAppointmentWithPay(AppointmentDto appointmentDto, Long userId) {
         // Create the AppointmentEntity
         AppointmentEntity appointment = new AppointmentEntity();
