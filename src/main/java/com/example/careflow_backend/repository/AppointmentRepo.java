@@ -16,6 +16,12 @@ public interface AppointmentRepo extends JpaRepository<AppointmentEntity, Long> 
 
     int countByDoctorIdAndStatus(Long doctorId, Integer status);
 
+    @Query("SELECT a FROM AppointmentEntity a WHERE a.isCancelled = false")
+    List<AppointmentEntity> findAllActiveAppointments();
+
+    List<AppointmentEntity> findByPatientIdAndIsCancelledFalse(Long patientId);
+
+
     @Query("SELECT a FROM AppointmentEntity a WHERE a.doctor.id = :doctorId AND a.status = 1 AND a.appointmentDate < CURRENT_DATE")
     List<AppointmentEntity> findHistory(Long doctorId);
 
