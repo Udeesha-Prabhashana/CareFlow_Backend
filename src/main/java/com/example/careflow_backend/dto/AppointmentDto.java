@@ -37,6 +37,13 @@ public class AppointmentDto {
         this.paymentDetails = paymentDetails;  // Initialize payment details
     }
 
+    public AppointmentDto(Long id, String patientName, LocalDate appointmentDate, Integer slotNumber) {
+        this.id = id;
+        this.patientName = patientName;
+        this.appointmentDate = appointmentDate;
+        this.slotNumber = slotNumber;
+    }
+    // Getters and Setters
     // Getters and Setters for the fields
 
 

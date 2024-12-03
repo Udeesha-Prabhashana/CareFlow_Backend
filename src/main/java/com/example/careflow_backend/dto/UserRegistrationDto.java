@@ -1,5 +1,6 @@
 package com.example.careflow_backend.dto;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -17,6 +18,12 @@ public record UserRegistrationDto (
 
         Double BookingCharge,
         String userSpecialization,
+
+        Integer experienceYears,
+
+        String department,
+
+
         @NotEmpty(message = "User email must not be empty") //Neither null nor 0 size
         @Email(message = "Invalid email format")
         String userEmail,

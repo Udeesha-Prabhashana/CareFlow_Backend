@@ -27,6 +27,7 @@ public class UserDto {
     private List<DoctorAvailabilityDto> availability;
     private Double docCharge;
     private String registrationNumber;
+    private String  department;
 
     @Data
     @AllArgsConstructor
@@ -50,6 +51,21 @@ public class UserDto {
         this.photoUrl = photoUrl;
         this.description =description;
         this.docCharge = docCharge;
+        this.registrationNumber = registrationNumber;
+    }
+
+    public UserDto(Long id, String userName, String emailId, String mobileNumber, String address, String name, String specialization, String roles, String photoUrl , String description, String department, String registrationNumber) {
+        this.id = id;
+        this.userName = userName;
+        this.emailId = emailId;
+        this.mobileNumber = mobileNumber;
+        this.address = address;
+        this.name = name;
+        this.specialization = specialization;
+        this.roles = roles;
+        this.photoUrl = photoUrl;
+        this.description =description;
+        this.department = department;
         this.registrationNumber = registrationNumber;
     }
 
@@ -117,11 +133,20 @@ public class UserDto {
         this.docCharge = docCharge;
     }
 
-    public UserDto(String name, String mobileNumber, String emailId, String photoUrl) {
+//    public UserDto(String name, String mobileNumber, String emailId, String photoUrl) {
+//        this.name = name;
+//        this.mobileNumber = mobileNumber;
+//        this.emailId = emailId;
+//        this.photoUrl = photoUrl;
+//    }
+
+    public UserDto(String name, String mobileNumber, String emailId, String photoUrl, String specialization, String description) {
         this.name = name;
         this.mobileNumber = mobileNumber;
         this.emailId = emailId;
         this.photoUrl = photoUrl;
+        this.specialization = specialization;
+        this.description = description;
     }
 
 }

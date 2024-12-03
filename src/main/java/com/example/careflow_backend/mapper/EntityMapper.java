@@ -1,6 +1,7 @@
 package com.example.careflow_backend.mapper;
 
 import com.example.careflow_backend.Entity.DoctorDetailsEntity;
+import com.example.careflow_backend.Entity.NurseDetailsEntity;
 import com.example.careflow_backend.Entity.UserEntity;
 import com.example.careflow_backend.dto.UserRegistrationDto;
 import lombok.RequiredArgsConstructor;
@@ -44,4 +45,16 @@ public class EntityMapper {
         doctorDetailsEntity.setDescription(userRegistrationDto.description());
         return doctorDetailsEntity;
     }
+
+    public NurseDetailsEntity convertNurseDetailsEntity(UserEntity userEntity, UserRegistrationDto userRegistrationDto) {
+        NurseDetailsEntity nurseDetailsEntity = new NurseDetailsEntity();
+        nurseDetailsEntity.setNurse(userEntity);
+        nurseDetailsEntity.setRegistrationNumber(userRegistrationDto.registrationNumber());
+        nurseDetailsEntity.setSpecialization(userRegistrationDto.userSpecialization());
+        nurseDetailsEntity.setDepartment(userRegistrationDto.department());
+        nurseDetailsEntity.setExperienceYears(userRegistrationDto.experienceYears());
+        nurseDetailsEntity.setDescription(userRegistrationDto.description());
+        return nurseDetailsEntity;
+    }
+
 }
