@@ -215,6 +215,12 @@ public class UserController {
         }
     }
 
+    @GetMapping("getPatientById/{id}")
+    public ResponseEntity<UserDto> getPatientById(@PathVariable Long id) {
+        UserDto userDto = userService.getUserById(id);
+        return ResponseEntity.ok(userDto);
+    }
+
     @PostMapping("/Receptionists/{userId}")
     public ResponseEntity<String> deleteReceptionists(@PathVariable Long userId) {
         try {
