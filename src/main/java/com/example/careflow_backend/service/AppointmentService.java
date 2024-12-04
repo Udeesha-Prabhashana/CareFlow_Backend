@@ -39,6 +39,7 @@ public class AppointmentService {
         appointmentEntity.setStatus(appointmentDto.getStatus());
         appointmentEntity.setReasonForVisit(appointmentDto.getReasonForVisit());
         appointmentEntity.setPayment(appointmentDto.getPayment());
+        appointmentEntity.setIsCancelled(false);
 
         // Retrieve Doctor Availability for the given date
         DoctorAvailabilityEntity availability = doctorAvailabilityService.getAvailabilityForDoctorOnDate(
@@ -181,6 +182,7 @@ public class AppointmentService {
         appointment.setStatus(appointmentDto.getStatus());
         appointment.setReasonForVisit(appointmentDto.getReasonForVisit());
         appointment.setPayment(appointmentDto.getPayment());
+        appointment.setIsCancelled(false);
 
         // Retrieve Doctor Availability for the given date
         DoctorAvailabilityEntity availability = doctorAvailabilityService.getAvailabilityForDoctorOnDate(
@@ -225,7 +227,6 @@ public class AppointmentService {
                         savedAppointment.getDoctor().getName(),
                         savedAppointment.getAppointmentDate().toString(),
                         savedAppointment.getSlotNumber(),
-                        savedAppointment.getReasonForVisit(),
                         paymentDetails.getAmountPaid().doubleValue() // Cast to double
                 );
 
